@@ -4,6 +4,7 @@ using Goal.Shared.ServerServiceModels;
 using Goal.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Goal.Shared.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Goal.Server.Controllers
 {
@@ -17,6 +18,7 @@ namespace Goal.Server.Controllers
             this.productRepo = productRepo;
         }
         [HttpPost("Add-Product")]
+        //[Authorize(Roles = "Admin")]
         public async Task<ActionResult<ProductServiceModel>> AddProduct(AddProductDto request)
         {
             return Ok(await productRepo.AddProduct(request));

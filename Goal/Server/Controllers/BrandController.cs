@@ -2,9 +2,13 @@
 using Goal.Shared.ServerServiceModels;
 using Goal.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace Goal.Server.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class BrandController : ControllerBase
     {
         private readonly IBrandRepo brandRepo;
@@ -20,6 +24,7 @@ namespace Goal.Server.Controllers
         }
 
         [HttpPost("Add-Brand")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BrandServiceModel>> AddBrand([FromBody]Brand NewBrand)
         {
             return Ok(await brandRepo.AddBrand(NewBrand));

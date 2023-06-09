@@ -8,7 +8,7 @@ namespace Goal.Shared.Entities
         [Key]
         [JsonIgnore]
         public int Id { get; set; }
-        [Required, StringLength(50, MinimumLength = 6)]
+        [Required, StringLength(50, MinimumLength = 6, ErrorMessage = "Назва має складатися з 6 або більше символів.")]
         public string? Name { get; set; }
         [Required, DataType(DataType.Currency)]
         public double OriginalPrice { get; set; } = 0.52;

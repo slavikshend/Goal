@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Goal.Server", "Goal\Server\Goal.Server.csproj", "{4FA5F1A0-A81C-4D86-B3E8-31C56F3DC2C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Goal.Server", "Goal\Server\Goal.Server.csproj", "{4FA5F1A0-A81C-4D86-B3E8-31C56F3DC2C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Goal.Client", "Goal\Client\Goal.Client.csproj", "{BC937077-C7CD-499A-9067-2028E25F4B62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Goal.Client", "Goal\Client\Goal.Client.csproj", "{BC937077-C7CD-499A-9067-2028E25F4B62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Goal.Shared", "Goal\Shared\Goal.Shared.csproj", "{B0C5022F-3ECF-48F5-97F5-CB78D9BE2569}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Goal.Shared", "Goal\Shared\Goal.Shared.csproj", "{B0C5022F-3ECF-48F5-97F5-CB78D9BE2569}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -32,11 +32,6 @@ namespace Goal.Server.Controllers
                 return Ok(new RegisterResult { Successful = false, Errors = errors });
 
             }
-            var roleManager = HttpContext.RequestServices.GetService<RoleManager<IdentityRole>>();
-            if (!await roleManager.RoleExistsAsync("User"))
-            {
-                await roleManager.CreateAsync(new IdentityRole("User"));
-            }
             await _userManager.AddToRoleAsync(newUser, "User");
             if (newUser.Email!.ToLower().StartsWith("admin"))
             {
