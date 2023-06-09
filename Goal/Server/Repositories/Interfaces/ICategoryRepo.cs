@@ -5,9 +5,10 @@ namespace Goal.Server.Repositories.Interfaces
 {
     public interface ICategoryRepo
     {
-        public Task<CategoryServiceModel> AddCategory(Category NewCategory);
-        public Task<CategoryServiceModel> GetCategories();
-        public Task<CategoryServiceModel> GetCategory(int CategoryId);
-        public Task<CategoryServiceModel> DeleteCategory(int CategoryId);
+        Task<ServiceModel<Category>> AddCategory(Category newCategory);
+        Task<ServiceModel<Category>> DeleteCategory(int id);
+        Task<ServiceModel<Category>> UpdateCategory(Category newCategory);
+        Task<ServiceModel<Category>> GetCategory(int id);
+        Task<ServiceModel<Category>> GetCategories();
     }
 }

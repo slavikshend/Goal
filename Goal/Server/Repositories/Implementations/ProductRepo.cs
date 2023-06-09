@@ -1,48 +1,31 @@
-﻿using Goal.Server.Repositories.Interfaces;
-using Goal.Server.Context;
-using Goal.Shared.ServerServiceModels;
+﻿using Goal.Server.Context;
+using Goal.Server.Repositories.Interfaces;
 using Goal.Shared.Entities;
+using Goal.Shared.ServerServiceModels;
 using Microsoft.EntityFrameworkCore;
-using Goal.Shared.Dto;
+using System;
 
-namespace Goal.Server.Repositories.Implementations
+namespace ORMExplained.Server.Repositories.Implementations
 {
     public class ProductRepo : IProductRepo
     {
         private readonly ShopOnlineDbContext appDbContext;
+
         public ProductRepo(ShopOnlineDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
         }
-        public async Task<ProductServiceModel> AddProduct(AddProductDto request)
+
+        public async Task<ServiceModel<Product>> AddProduct(Product NewProduct)
         {
-            var Response = new ProductServiceModel();
-            var brand = await appDbContext.Brands.FindAsync(request.BrandId);
-            var category = await appDbContext.Categories.FindAsync(request.CategoryId);
-            if (brand == null || category == null) {
-                Response.Success = false;
-                Response.Message = "Error";
-                Response.CssClass = "danger";
-            }
-            var NewProduct = new Product
-            {
-                Name = request.Name,
-                OriginalPrice = request.OriginalPrice,
-                NewPrice = request.NewPrice,
-                Description = request.Description,
-                Category = category,
-                Brand = brand,
-                Quantity = request.Quantity,
-                Image = request.Image,
-                UploadedDate = request.UploadedDate
-            };
+            var Response = new ServiceModel<Product>();
             if (NewProduct != null)
             {
                 try
                 {
                     appDbContext.Products.Add(NewProduct);
                     await appDbContext.SaveChangesAsync();
-                    Response.SingleProduct = NewProduct;
+                    Response.Single = NewProduct;
                     Response.Success = true;
                     Response.Message = "Product added successfully!";
                     Response.CssClass = "success";
@@ -60,13 +43,37 @@ namespace Goal.Server.Repositories.Implementations
                 Response.Success = false;
                 Response.Message = "Sorry New product object is empty!";
                 Response.CssClass = "warning";
-                Response.SingleProduct = null!;
+                Response.Single = null!;
                 return Response;
             }
         }
-        public async Task<ProductServiceModel> GetProduct(int ProductId)
+
+        public async Task<ServiceModel<Product>> DeleteProduct(int ProductId)
         {
-            var Response = new ProductServiceModel();
+            var response = new ServiceModel<Product>();
+            var product = await GetProduct(ProductId);
+            if (product.Single != null)
+            {
+                appDbContext.Products.Remove(product.Single);
+                await appDbContext.SaveChangesAsync();
+                response.Message = "Product deleted!";
+                response.CssClass = "success fw-bold";
+                response.Single = product.Single;
+                var products = await GetProducts();
+                response.List = products.List;
+            }
+            else
+            {
+                response.Message = product.Message;
+                response.CssClass = product.CssClass;
+            }
+            return response;
+
+        }
+
+        public async Task<ServiceModel<Product>> GetProduct(int ProductId)
+        {
+            var Response = new ServiceModel<Product>();
             if (ProductId > 0)
             {
                 try
@@ -74,7 +81,7 @@ namespace Goal.Server.Repositories.Implementations
                     var product = await appDbContext.Products.SingleOrDefaultAsync(p => p.Id == ProductId);
                     if (product != null)
                     {
-                        Response.SingleProduct = product;
+                        Response.Single = product;
                         Response.Success = true;
                         Response.Message = "Product found!";
                         Response.CssClass = "success";
@@ -83,9 +90,9 @@ namespace Goal.Server.Repositories.Implementations
                     else
                     {
                         Response.Success = false;
-                        Response.Message = "Product doesn't exist!";
-                        Response.CssClass = "info";
-                        Response.SingleProduct = null!;
+                        Response.Message = "Sorry product you are looking for doesn't exist!";
+                        Response.CssClass = "danger";
+                        Response.Single = null!;
                         return Response;
                     }
 
@@ -102,19 +109,20 @@ namespace Goal.Server.Repositories.Implementations
                 Response.Success = false;
                 Response.Message = "Sorry New product object is empty!";
                 Response.CssClass = "warning";
-                Response.SingleProduct = null!;
+                Response.Single = null!;
                 return Response;
             }
         }
-        public async Task<ProductServiceModel> GetProducts()
+
+        public async Task<ServiceModel<Product>> GetProducts()
         {
-            var Response = new ProductServiceModel();
+            var Response = new ServiceModel<Product>();
             try
             {
                 var products = await appDbContext.Products.ToListAsync();
                 if (products != null)
                 {
-                    Response.ProductList = products;
+                    Response.List = products;
                     Response.Success = true;
                     Response.Message = "Products found!";
                     Response.CssClass = "success";
@@ -123,9 +131,9 @@ namespace Goal.Server.Repositories.Implementations
                 else
                 {
                     Response.Success = false;
-                    Response.Message = "No products found!";
+                    Response.Message = "Sorry No products found!";
                     Response.CssClass = "info";
-                    Response.ProductList = null!;
+                    Response.List = null!;
                     return Response;
                 }
 
@@ -137,9 +145,41 @@ namespace Goal.Server.Repositories.Implementations
                 return Response;
             }
         }
-        public Task<ProductServiceModel> DeleteProduct(int ProductId)
+
+        public async Task<ServiceModel<Product>> UpdateProduct(Product NewProduct)
         {
-            throw new NotImplementedException();
+            var response = new ServiceModel<Product>();
+            if (NewProduct != null)
+            {
+                var product = await GetProduct(NewProduct.Id);
+                if (product.Single != null)
+                {
+                    product.Single.Name = NewProduct.Name;
+                    product.Single.OriginalPrice = NewProduct.OriginalPrice;
+                    product.Single.NewPrice = NewProduct.NewPrice;
+                    product.Single.Description = NewProduct.Description;
+                    product.Single.Quantity = NewProduct.Quantity;
+                    product.Single.Image = NewProduct.Image;
+                    await appDbContext.SaveChangesAsync();
+                    response.Message = "Product updated successfully !";
+                    response.Success = true;
+                    response.CssClass = "success fw-bold";
+                    response.Single = product.Single;
+                }
+                else
+                {
+                    response.Message = "Sorry product not found";
+                    response.Success = false;
+                    response.CssClass = "danger fw-bold";
+                }
+            }
+            else
+            {
+                response.Message = "Sorry product object is empty";
+                response.Success = false;
+                response.CssClass = "danger fw-bold";
+            }
+            return response;
         }
     }
 }

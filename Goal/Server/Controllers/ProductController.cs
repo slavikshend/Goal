@@ -19,19 +19,19 @@ namespace Goal.Server.Controllers
         }
         [HttpPost("Add-Product")]
         //[Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ProductServiceModel>> AddProduct(AddProductDto request)
+        public async Task<ActionResult<ServiceModel>> AddProduct(AddProductDto request)
         {
             return Ok(await productRepo.AddProduct(request));
         }
 
         [HttpGet]
-        public async Task<ActionResult<ProductServiceModel>> GetProducts()
+        public async Task<ActionResult<ServiceModel>> GetProducts()
         {
             return Ok(await productRepo.GetProducts());
         }
 
         [HttpGet("Get-Product/{ProductId:int}")]
-        public async Task<ActionResult<ProductServiceModel>> GetProduct(int ProductId)
+        public async Task<ActionResult<ServiceModel>> GetProduct(int ProductId)
         {
             return Ok(await productRepo.GetProduct(ProductId));
         }

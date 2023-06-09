@@ -1,6 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">E-Commerce</a>
+        <a class="navbar-brand" href="">Goal Sports Shop</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -11,24 +12,65 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="oi oi-home" aria-hidden="true"></span> Головна
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="addProduct" Match="NavLinkMatch.All">
-                <span class="oi oi-plus" aria-hidden="true"></span> Add Product
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="updateProduct" Match="NavLinkMatch.All">
-                <span class="oi oi-arrow-circle-top" aria-hidden="true"></span> Update Product
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="deleteProduct" Match="NavLinkMatch.All">
-                <span class="oi oi-trash" aria-hidden="true"></span> Delete Product
-            </NavLink>
-        </div>
+        <AuthorizeView Roles="Admin">
+            <div class="nav-item px-3">
+                <span class="text-muted">Управління продуктами</span>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="addProduct" Match="NavLinkMatch.All">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Додати
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="updateProduct" Match="NavLinkMatch.All">
+                    <span class="oi oi-arrow-circle-top" aria-hidden="true"></span> Редагувати
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="deleteProduct" Match="NavLinkMatch.All">
+                    <span class="oi oi-trash" aria-hidden="true"></span> Видалити
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <span class="text-muted">Управління брендами</span>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="addBrand" Match="NavLinkMatch.All">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Додати
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="updateBrand" Match="NavLinkMatch.All">
+                    <span class="oi oi-arrow-circle-top" aria-hidden="true"></span> Редагувати
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="deleteBrand" Match="NavLinkMatch.All">
+                    <span class="oi oi-trash" aria-hidden="true"></span> Видалити
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <span class="text-muted">Управління категоріями</span>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="addCategory" Match="NavLinkMatch.All">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Додати
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="updateCategory" Match="NavLinkMatch.All">
+                    <span class="oi oi-arrow-circle-top" aria-hidden="true"></span> Редагувати
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="deleteCategory" Match="NavLinkMatch.All">
+                    <span class="oi oi-trash" aria-hidden="true"></span> Видалити
+                </NavLink>
+            </div>
+        </AuthorizeView>
     </nav>
 </div>
 

@@ -1,10 +1,10 @@
 ﻿using Goal.Server.Repositories.Interfaces;
-using Goal.Server.Context;
-using Goal.Shared.ServerServiceModels;
 using Goal.Shared.Entities;
+using Goal.Shared.ServerServiceModels;
+using Goal.Server.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Goal.Server.Repositories.Implementations
+namespace Goal.Server.Repositories.CategoryRepositories
 {
     public class CategoryRepo : ICategoryRepo
     {
@@ -13,113 +13,156 @@ namespace Goal.Server.Repositories.Implementations
         {
             this.appDbContext = appDbContext;
         }
-        public async Task<CategoryServiceModel> AddCategory(Category NewCategory)
+
+        public async Task<ServiceModel<Category>> AddCategory(Category newCategory)
         {
-            var Response = new CategoryServiceModel();
-            if (NewCategory != null)
+            var response = new ServiceModel<Category>();
+            if (newCategory != null)
             {
-                try
+                var category = await appDbContext.Categories!.FirstOrDefaultAsync(c => c.Name == newCategory.Name);
+                if (category != null)
                 {
-                    appDbContext.Categories.Add(NewCategory);
-                    await appDbContext.SaveChangesAsync();
-                    Response.SingleCategory = NewCategory;
-                    Response.Success = true;
-                    Response.Message = "Category added successfully!";
-                    Response.CssClass = "success";
-                    return Response;
-                }
-                catch (Exception exMessage)
-                {
-                    Response.CssClass = "danger";
-                    Response.Message = exMessage.Message.ToString();
-                    return Response;
-                }
-            }
-            else
-            {
-                Response.Success = false;
-                Response.Message = "Category object is null";
-                Response.CssClass = "warning";
-                Response.SingleCategory = null!;
-                return Response;
-            }
-        }
-        public async Task<CategoryServiceModel> GetCategories()
-        {
-            var Response = new CategoryServiceModel();
-            try
-            {
-                var categories = await appDbContext.Categories.ToListAsync();
-                if (categories != null)
-                {
-                    Response.CategoryList = categories;
-                    Response.Success = true;
-                    Response.Message = "Categories found!";
-                    Response.CssClass = "success";
-                    return Response;
+                    response.Message = "Category already created !";
+                    response.Success = false;
+                    response.CssClass = "info fw-bold";
                 }
                 else
                 {
-                    Response.Success = false;
-                    Response.Message = "No categories found!";
-                    Response.CssClass = "info";
-                    Response.CategoryList = null!;
-                    return Response;
-                }
-
-            }
-            catch (Exception exMessage)
-            {
-                Response.CssClass = "danger";
-                Response.Message = exMessage.Message.ToString();
-                return Response;
-            }
-        }
-        public async Task<CategoryServiceModel> GetCategory(int CategoryId)
-        {
-            var Response = new CategoryServiceModel();
-            if (CategoryId > 0)
-            {
-                try
-                {
-                    var category = await appDbContext.Categories.SingleOrDefaultAsync(p => p.Id == CategoryId);
-                    if (category != null)
-                    {
-                        Response.SingleCategory = category;
-                        Response.Success = true;
-                        Response.Message = "Category found!";
-                        Response.CssClass = "success";
-                        return Response;
-                    }
-                    else
-                    {
-                        Response.Success = false;
-                        Response.Message = "Category doesn't exist!";
-                        Response.CssClass = "info";
-                        Response.SingleCategory = null!;
-                        return Response;
-                    }
-
-                }
-                catch (Exception exMessage)
-                {
-                    Response.CssClass = "danger";
-                    Response.Message = exMessage.Message.ToString();
-                    return Response;
+                    newCategory.Url = newCategory.Name!.ToLower().Replace(" ", "-");
+                    appDbContext.Categories.Add(newCategory);
+                    await appDbContext.SaveChangesAsync();
+                    response.Message = "Category created!";
+                    response.Success = true;
+                    response.CssClass = "success fw-bold";
+                    var list = await GetCategories();
+                    response.List = list.List;
                 }
             }
             else
             {
-                Response.Success = false;
-                Response.Message = "Category object is empty!";
-                Response.CssClass = "warning";
-                Response.SingleCategory = null!;
-                return Response;
+                response.Message = "Category object is empty !";
+                response.Success = false;
+                response.CssClass = "danger fw-bold";
             }
+            return response;
         }
-        public Task<CategoryServiceModel> DeleteCategory(int CategoryId)
+
+        public async Task<ServiceModel<Category>> DeleteCategory(int id)
         {
-            throw new NotImplementedException();
+            var response = new ServiceModel<Category>();
+            if (id > 0)
+            {
+                var category = await GetCategory(id);
+                if (category != null)
+                {
+                    appDbContext.Categories.Remove(category!.Single!);
+                    await appDbContext.SaveChangesAsync();
+                    response.Message = $"Category with the name {category.Single?.Name} deleted!";
+                    response.Success = false;
+                    response.CssClass = "danger fw-bold";
+                    response.Single = category.Single;
+                    var list = await GetCategories();
+                    response.List = list.List;
+                }
+                else
+                {
+                    response.Message = category!.Message;
+                    response.Success = category.Success;
+                    response.CssClass = category.CssClass;
+                }
+            }
+            else
+            {
+                response.Message = "Invalid category!";
+                response.Success = false;
+                response.CssClass = "danger fw-bold";
+            }
+            return response;
+        }
+
+        public async Task<ServiceModel<Category>> GetCategories()
+        {
+            var response = new ServiceModel<Category>();
+            var result = await appDbContext.Categories.ToListAsync();
+            if (result != null)
+            {
+                response.List = result;
+                response.Message = "Categories found!";
+                response.CssClass = "success fw-bold";
+                response.Success = true;
+            }
+            else
+            {
+                response.Message = "Categories not found!";
+                response.CssClass = "info fw-bold";
+                response.Success = false;
+            }
+            return response;
+        }
+
+        public async Task<ServiceModel<Category>> GetCategory(int id)
+        {
+            var response = new ServiceModel<Category>();
+            if (id > 0)
+            {
+                var category = await appDbContext.Categories.SingleOrDefaultAsync(c => c.Id == id);
+                if (category != null)
+                {
+                    response.Message = "Category  found!";
+                    response.CssClass = "success fw-bold";
+                    response.Success = true;
+                    response.Single = category;
+                }
+                else
+                {
+                    response.Message = "Category not found!";
+                    response.CssClass = "danger fw-bold";
+                    response.Success = false;
+                }
+            }
+            else
+            {
+                response.Message = "Invalid category!";
+                response.CssClass = "danger fw-bold";
+                response.Success = false;
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceModel<Category>> UpdateCategory(Category newCategory)
+        {
+            var response = new ServiceModel<Category>();
+            if (newCategory != null)
+            {
+                var category = await GetCategory(newCategory.Id);
+                if (category.Single != null)
+                {
+                    category.Single.Name = newCategory.Name;
+                    category.Single.Url = newCategory.Name!.ToLower().Replace(" ", "-");
+                    category.Single.Image = newCategory.Image;
+                    await appDbContext.SaveChangesAsync();
+                    response.Message = "Category updated!";
+                    response.CssClass = "success fw-bold";
+                    response.Single = category.Single;
+                    response.Success = true;
+                    var categories = await GetCategories();
+                    response.List = categories.List;
+                }
+                else
+                {
+                    response.Message = category.Message;
+                    response.CssClass = category.CssClass;
+                    response.Success = category.Success;
+                }
+            }
+            else
+            {
+                response.Message = "Category object is empty!";
+                response.CssClass = "danger fw-bold";
+                response.Success = false;
+            }
+            return response;
         }
     }
 }

@@ -1,16 +1,19 @@
-﻿@page "/"
+﻿@page "/manage-products"
 @using Goal.Client.Services.InterfaceServices;
+@using Goal.Shared.Entities;
 @using Goal.Shared.ServerServiceModels;
-@inject IProductService productService
 
-@if (serviceModel.ProductList != null)
+@inject IProductService productService
+@inject IJSRuntime JS
+@inject NavigationManager navigationManager
+@if (serviceModel.List != null)
 {
     <div class="row">
         <div class="row sticky-top mb-1">
-            <div class="col-md-8 mt-1"><h3 class="text-muted" style="font-family:'Javanese Text'">Продукти</h3></div>
+            <div class="col-md-8 mt-1"><h3 class="text-muted" style="font-family:'Javanese Text'">Manage Products</h3></div>
         </div>
         <hr />
-        @foreach (var product in serviceModel.ProductList)
+        @foreach (var product in serviceModel.List)
         {
             <div class="col-md-3">
                 <div class="card border-1 m-2 mb-2">
@@ -19,7 +22,7 @@
                             <img class="card-img-top" src="@product.Image" style="width:200px; height:150px" />
                             @if (DateTime.Now < product.UploadedDate.AddDays(30))
                             {
-                                <span class="badge bg-info position-absolute top-0 start-100 translate-middle badge rounded-pill">Новинка!</span>
+                                <span class="badge bg-info position-absolute top-0 start-100 translate-middle badge rounded-pill">New</span>
                             }
                         </div>
                         <div class="card-body">
@@ -29,24 +32,28 @@
                                 <span class="text-secondary text-muted fs-6">@product.Description</span><br>
                                 @if (product.NewPrice != 0 && product.NewPrice < product.OriginalPrice)
                                 {
-                                    <span class="text-danger text-decoration-line-through" style="font-size:16px;"><i>@product.OriginalPrice</i></span>
+                                    <span class="text-danger text-decoration-line-through" style="font-size:16px;"><i>Gh¢@product.OriginalPrice</i></span>
                                     <span>&nbsp; &nbsp;</span>
                                     <span class="badge bg-primary badge rounded-end bg-danger">Reduced</span>
                                     <br />
-                                    <span class="text-primary text-center" style="font-size:16px;"><i>@product.NewPrice</i></span>
+                                    <span class="text-primary text-center" style="font-size:16px;"><i>Gh¢@product.NewPrice</i></span>
                                 }
                                 else
                                 {
-                                    <span class="text-danger" style="font-size:16px;"><i>@product.OriginalPrice</i></span>
+                                    <span class="text-danger" style="font-size:16px;"><i>Gh¢@product.OriginalPrice</i></span>
                                 }
 
                             </p>
                         </div>
                     </a>
                     <div class="card-footer bg-white">
-                        <button class="btn btn-outline-danger btn-sm">
-                            <i class="oi oi-cart fs-5"></i>
-                            Додати до корзини
+                        <button class="btn btn-outline-warning btn-sm float-start" @onclick="(()=> HandleUpdate(product.Id))">
+                            <i class="oi oi-arrow-circle-top"></i>
+                            Update
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm float-end" @onclick="(async ()=> await HandleDelete(product.Id, product.Name!))">
+                            <i class="oi oi-trash"></i>
+                            Delete
                         </button>
                     </div>
                 </div>
@@ -76,7 +83,9 @@ else
 
 
 @code {
-    public ServiceModel serviceModel = new ServiceModel();
+    string Message = string.Empty;
+    string Cssclass = string.Empty;
+    public ServiceModel<Product> serviceModel = new ServiceModel<Product>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,4 +95,20 @@ else
 
     private async Task GetProducts() => serviceModel = await productService.GetProducts();
 
+    private async Task HandleDelete(int id, string name)
+    {
+        bool confirm = await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {name} ?");
+        if (confirm)
+        {
+            var product = await productService.DeleteProduct(id);
+            Message = product!.Single!.Name + "deleted from the list";
+            Cssclass = product.CssClass!;
+            serviceModel.List = product.List;
+        }else{ return; }
+    }
+    
+    private void HandleUpdate(int id)
+    {
+        navigationManager.NavigateTo($"update-product/{id}");
+    }
 }

@@ -83,3 +83,11 @@ main {
         padding-right: 1.5rem !important;
     }
 }
+
+.footer {
+    background-color: #f7f7f7;
+    border-top: 1px solid #d6d5d5;
+    padding: 1rem;
+    text-align: center;
+    margin-top: auto;
+}

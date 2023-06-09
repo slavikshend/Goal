@@ -12,26 +12,34 @@ namespace Goal.Client.Services.ImplementationServices
         {
             this.httpClient = httpClient;
         }
-        public async Task<ProductServiceModel?> AddProduct(Product NewProduct)
+        public async Task<ServiceModel<Product>?> AddProduct(Product NewProduct)
         {
             var product = await httpClient.PostAsJsonAsync("api/Product/Add-Product", NewProduct);
-            return await product.Content.ReadFromJsonAsync<ProductServiceModel>();
+            return await product.Content.ReadFromJsonAsync<ServiceModel<Product>>();
         }
 
-        public async Task<ProductServiceModel?> GetProduct(int ProductId)
+        public async Task<ServiceModel<Product>?> DeleteProduct(int ProductId)
+        {
+            var result = await httpClient.DeleteFromJsonAsync<ServiceModel<Product>>($"api/Product/{ProductId}");
+            return result;
+        }
+
+        public async Task<ServiceModel<Product>?> GetProduct(int ProductId)
         {
             var result = await httpClient.GetAsync($"api/Product/Get-Product/{ProductId}");
-            return await result.Content.ReadFromJsonAsync<ProductServiceModel>();
+            return await result.Content.ReadFromJsonAsync<ServiceModel<Product>>();
         }
 
-        public async Task<ProductServiceModel?> GetProducts()
+        public async Task<ServiceModel<Product>?> GetProducts()
         {
             var result = await httpClient.GetAsync("api/Product");
-            return await result.Content.ReadFromJsonAsync<ProductServiceModel>();
+            return await result.Content.ReadFromJsonAsync<ServiceModel<Product>>();
         }
-        public Task<ProductServiceModel?> DeleteProduct(int ProductId)
+
+        public async Task<ServiceModel<Product>?> UpdateProduct(Product NewProduct)
         {
-            throw new NotImplementedException();
+            var result = await httpClient.PutAsJsonAsync("api/Product", NewProduct);
+            return await result.Content.ReadFromJsonAsync<ServiceModel<Product>>();
         }
     }
 }
