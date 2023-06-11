@@ -1,0 +1,87 @@
+﻿@page "/manage-brands"
+@using Goal.Client.Services.InterfaceServices;
+@using Goal.Shared.Entities;
+@using Goal.Shared.ServerServiceModels;
+
+@inject IBrandService brandservice
+@inject IJSRuntime JS
+@inject NavigationManager navigationManager
+@if (serviceModel.List != null)
+{
+    <div class="row">
+        <div class="row sticky-top mb-1">
+            <div class="col-md-8 mt-1"><h3 class="text-muted" style="font-family:'Javanese Text'">Редагувати/видалити бренди</h3></div>
+        </div>
+        <hr />
+        @foreach (var brand in serviceModel.List)
+        {
+            <div class="col-md-3">
+                <div class="card border-1 m-2 mb-2">
+                    <a href="productDetails/@brand.Id" style="text-decoration:none;">
+                        <div class="card-body">
+                            <p>
+                                <span class="text-primary">Назва: @brand.Name </span>&nbsp; &nbsp;
+                                <br />
+                            </p>
+                        </div>
+                    </a>
+                    <div class="card-footer bg-white">
+                        <button class="btn btn-outline-warning btn-sm float-start" @onclick="(()=> HandleUpdate(brand.Id))">
+                            <i class="oi oi-arrow-circle-top"></i>
+                            Редагувати
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm float-end" @onclick="(async ()=> await HandleDelete(brand.Id, brand.Name!))">
+                            <i class="oi oi-trash"></i>
+                            Видалити
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-3 mb-5">
+                <div class="d-flex justify-content-center mt-5">
+                    <div class="spinner-border text-danger" role="status" style="width: 5rem; height: 5rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    string Message = string.Empty;
+    string Cssclass = string.Empty;
+    public ServiceModel<Brand> serviceModel = new ServiceModel<Brand>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetBrands();
+    }
+
+
+    private async Task GetBrands() => serviceModel = await brandservice.GetBrands();
+
+    private async Task HandleDelete(int id, string name)
+    {
+        bool confirm = await JS.InvokeAsync<bool>("confirm", $"Ви впевнені, що хочете видалити {name} ?");
+        if (confirm)
+        {
+            var brand = await brandservice.DeleteBrand(id);
+            await JS.InvokeVoidAsync("alert", $"{name} видалено зі списку");
+            serviceModel.List = brand.List;
+        }
+        else { return; }
+    }
+
+    private void HandleUpdate(int id)
+    {
+        navigationManager.NavigateTo($"update-brand/{id}");
+    }
+}

@@ -5,10 +5,10 @@ namespace Goal.Server.Repositories.Interfaces
 {
     public interface IBrandRepo
     {
-        Task<ServiceModel<Brand>> AddBrand(Brand newBrand);
-        Task<ServiceModel<Brand>> DeleteBrand(int id);
-        Task<ServiceModel<Brand>> UpdateBrand(Brand newBrand);
-        Task<ServiceModel<Brand>> GetBrand(int id);
-        Task<ServiceModel<Brand>> GetBrands();
+        public Task<ServiceModel<Brand>> AddBrand(Brand newBrand);
+        public Task<ServiceModel<Brand>> DeleteBrand(int id);
+        public Task<ServiceModel<Brand>> UpdateBrand(Brand newBrand);
+        public Task<ServiceModel<Brand>> GetBrand(int id);
+        public Task<ServiceModel<Brand>> GetBrands();
     }
 }

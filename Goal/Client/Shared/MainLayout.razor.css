@@ -2,6 +2,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 main {
@@ -9,7 +10,18 @@ main {
 }
 
 .sidebar {
-    background: linear-gradient(to bottom, black, blue); 
+    background: linear-gradient(to bottom, black, blue);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+    background-color: linear-gradient(to bottom, black, blue);
+    border-top: 1px solid #d6d5d5;
+    text-align: center;
+    color: white; /* Optional: Change the text color to white */
 }
 
 .top-row {
@@ -21,19 +33,19 @@ main {
     align-items: center;
 }
 
-    .top-row ::deep a,
-    .top-row ::deep .btn-link {
+    .top-row a,
+    .top-row .btn-link {
         white-space: nowrap;
         margin-left: 1.5rem;
         text-decoration: none;
     }
 
-        .top-row ::deep a:hover,
-        .top-row ::deep .btn-link:hover {
+        .top-row a:hover,
+        .top-row .btn-link:hover {
             text-decoration: underline;
         }
 
-        .top-row ::deep a:first-child {
+        .top-row a:first-child {
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -47,8 +59,8 @@ main {
         justify-content: space-between;
     }
 
-    .top-row ::deep a,
-    .top-row ::deep .btn-link {
+    .top-row a,
+    .top-row .btn-link {
         margin-left: 0;
     }
 }
@@ -71,7 +83,7 @@ main {
         z-index: 1;
     }
 
-        .top-row.auth ::deep a:first-child {
+        .top-row.auth a:first-child {
             flex: 1;
             text-align: right;
             width: 0;
@@ -84,10 +96,6 @@ main {
     }
 }
 
-.footer {
-    background-color: #f7f7f7;
-    border-top: 1px solid #d6d5d5;
-    padding: 1rem;
-    text-align: center;
-    margin-top: auto;
+.main {
+    flex: 1;
 }

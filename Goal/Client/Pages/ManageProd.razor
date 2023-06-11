@@ -10,7 +10,7 @@
 {
     <div class="row">
         <div class="row sticky-top mb-1">
-            <div class="col-md-8 mt-1"><h3 class="text-muted" style="font-family:'Javanese Text'">Manage Products</h3></div>
+            <div class="col-md-8 mt-1"><h3 class="text-muted" style="font-family:'Javanese Text'">Видалити/редагувати продукти</h3></div>
         </div>
         <hr />
         @foreach (var product in serviceModel.List)
@@ -20,10 +20,6 @@
                     <a href="productDetails/@product.Id" style="text-decoration:none;">
                         <div class="card-header text-center">
                             <img class="card-img-top" src="@product.Image" style="width:200px; height:150px" />
-                            @if (DateTime.Now < product.UploadedDate.AddDays(30))
-                            {
-                                <span class="badge bg-info position-absolute top-0 start-100 translate-middle badge rounded-pill">New</span>
-                            }
                         </div>
                         <div class="card-body">
                             <p>
@@ -32,17 +28,16 @@
                                 <span class="text-secondary text-muted fs-6">@product.Description</span><br>
                                 @if (product.NewPrice != 0 && product.NewPrice < product.OriginalPrice)
                                 {
-                                    <span class="text-danger text-decoration-line-through" style="font-size:16px;"><i>Gh¢@product.OriginalPrice</i></span>
+                                    <span class="text-danger text-decoration-line-through" style="font-size:16px;"><i>@product.OriginalPrice</i></span>
                                     <span>&nbsp; &nbsp;</span>
-                                    <span class="badge bg-primary badge rounded-end bg-danger">Reduced</span>
+                                    <span class="badge bg-primary badge rounded-end bg-danger">Знижка</span>
                                     <br />
-                                    <span class="text-primary text-center" style="font-size:16px;"><i>Gh¢@product.NewPrice</i></span>
+                                    <span class="text-primary text-center" style="font-size:16px;"><i>@product.NewPrice</i></span>
                                 }
                                 else
                                 {
-                                    <span class="text-danger" style="font-size:16px;"><i>Gh¢@product.OriginalPrice</i></span>
+                                    <span class="text-danger" style="font-size:16px;"><i>@product.OriginalPrice</i></span>
                                 }
-
                             </p>
                         </div>
                     </a>
@@ -77,11 +72,6 @@ else
 }
 
 
-
-
-
-
-
 @code {
     string Message = string.Empty;
     string Cssclass = string.Empty;
@@ -89,24 +79,31 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await GetProducts();
+        if (productService != null)
+        {
+            serviceModel = await productService.GetProducts();
+        }
     }
-
-
-    private async Task GetProducts() => serviceModel = await productService.GetProducts();
 
     private async Task HandleDelete(int id, string name)
     {
-        bool confirm = await JS.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {name} ?");
+        bool confirm = await JS.InvokeAsync<bool>("confirm", $"Видалити {name} ?");
         if (confirm)
         {
             var product = await productService.DeleteProduct(id);
-            Message = product!.Single!.Name + "deleted from the list";
-            Cssclass = product.CssClass!;
-            serviceModel.List = product.List;
-        }else{ return; }
+            if (product != null && product.Single != null)
+            {
+                Message = product.Single.Name + " видалено зі списку";
+            }
+            Cssclass = product?.CssClass ?? string.Empty;
+            serviceModel.List = product?.List ?? new List<Product>();
+        }
+        else
+        {
+            return;
+        }
     }
-    
+
     private void HandleUpdate(int id)
     {
         navigationManager.NavigateTo($"update-product/{id}");

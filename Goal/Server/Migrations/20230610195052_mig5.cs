@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Goal.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class mig2 : Migration
+    public partial class mig5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,7 +59,7 @@ namespace Goal.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,7 +73,8 @@ namespace Goal.Server.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
-                    IconCSS = table.Column<string>(type: "text", nullable: true)
+                    Url = table.Column<string>(type: "text", nullable: true),
+                    Image = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -196,11 +197,10 @@ namespace Goal.Server.Migrations
                     OriginalPrice = table.Column<double>(type: "double precision", nullable: false),
                     NewPrice = table.Column<double>(type: "double precision", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    CategoryId = table.Column<int>(type: "integer", nullable: true),
-                    BrandId = table.Column<int>(type: "integer", nullable: true),
+                    BrandId = table.Column<int>(type: "integer", nullable: false),
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
-                    Image = table.Column<string>(type: "text", nullable: false),
-                    UploadedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Image = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -209,12 +209,14 @@ namespace Goal.Server.Migrations
                         name: "FK_Products_Brands_BrandId",
                         column: x => x.BrandId,
                         principalTable: "Brands",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -222,8 +224,8 @@ namespace Goal.Server.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "9121ef9d-ad86-4468-ba7d-8b2fe5594e1f", "86ae6b04-db20-4463-83f6-d4b85c35f5c8", "User", "USER" },
-                    { "dfeae8e8-e397-491c-ab33-b9f258a0dcce", "bec92ddc-05c8-4479-b37d-095d1348f2e7", "Admin", "ADMIN" }
+                    { "74a36f82-2dca-4ff3-be8d-d1100cb736df", "09800f14-680e-47d8-b450-9d35492ce97f", "Admin", "ADMIN" },
+                    { "81e7f75e-7ad4-482b-97d6-574f47bd0fed", "49df7c80-1ff5-4383-a5a3-b9b29e4f4f41", "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(

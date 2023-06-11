@@ -11,26 +11,39 @@ namespace Goal.Client.Services.ImplementationServices
         {
             this.httpClient = httpClient;
         }
-        public async Task<BrandServiceModel?> AddBrand(Brand NewBrand)
+
+        public async Task<ServiceModel<Brand>> AddBrand(Brand newBrand)
         {
-            var brand = await httpClient.PostAsJsonAsync("api/Brand/Add-Brand", NewBrand);
-            return await brand.Content.ReadFromJsonAsync<BrandServiceModel>();
+            var response = await httpClient.PostAsJsonAsync("api/Brand", newBrand);
+            var result = await response.Content.ReadFromJsonAsync<ServiceModel<Brand>>();
+            return result!;
         }
 
-        public async Task<BrandServiceModel?> GetBrand(int BrandId)
+        public async Task<ServiceModel<Brand>> DeleteBrand(int id)
         {
-            var result = await httpClient.GetAsync($"api/Brand/Get-Brand/{BrandId}");
-            return await result.Content.ReadFromJsonAsync<BrandServiceModel>();
+            var response = await httpClient.DeleteFromJsonAsync<ServiceModel<Brand>>($"api/Brand/{id}");
+            return response!;
         }
 
-        public async Task<BrandServiceModel?> GetBrands()
+        public async Task<ServiceModel<Brand>> GetBrands()
         {
-            var result = await httpClient.GetAsync("api/Get-Brands");
-            return await result.Content.ReadFromJsonAsync<BrandServiceModel>();
+            var response = await httpClient.GetAsync("api/Brand");
+            var result = await response.Content.ReadFromJsonAsync<ServiceModel<Brand>>();
+            return result!;
         }
-        public Task<BrandServiceModel?> DeleteBrand(int BrandId)
+
+        public async Task<ServiceModel<Brand>> GetBrand(int id)
         {
-            throw new NotImplementedException();
+            var response = await httpClient.GetAsync($"api/Brand/{id}");
+            var result = await response.Content.ReadFromJsonAsync<ServiceModel<Brand>>();
+            return result!;
+        }
+
+        public async Task<ServiceModel<Brand>> UpdateBrand(Brand newBrand)
+        {
+            var response = await httpClient.PutAsJsonAsync("api/Brand", newBrand);
+            var result = await response.Content.ReadFromJsonAsync<ServiceModel<Brand>>();
+            return result!;
         }
     }
 }

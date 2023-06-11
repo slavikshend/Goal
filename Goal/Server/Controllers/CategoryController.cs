@@ -1,7 +1,10 @@
 ﻿using Goal.Server.Repositories.Interfaces;
-using Goal.Shared.ServerServiceModels;
 using Goal.Shared.Entities;
+using Goal.Shared.ServerServiceModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Goal.Server.Repositories.Implementations;
+
 
 namespace Goal.Server.Controllers
 {
@@ -16,21 +19,33 @@ namespace Goal.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<CategoryServiceModel>> GetCategories()
+        public async Task<ActionResult<ServiceModel<Category>>> GetCategories()
         {
             return Ok(await categoryRepo.GetCategories());
         }
 
-        [HttpPost("Add-Category")]
-        public async Task<ActionResult<CategoryServiceModel>> AddCategory([FromBody] Category NewCategory)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ServiceModel<Category>>> GetCategory(int id)
         {
-            return Ok(await categoryRepo.AddCategory(NewCategory));
+            return Ok(await categoryRepo.GetCategory(id));
         }
 
-        [HttpGet("Get-Category/{CategoryId:int}")]
-        public async Task<ActionResult<CategoryServiceModel>> GetCategory(int CategoryId)
+        [HttpPost]
+        public async Task<ActionResult<ServiceModel<Category>>> AddCategory(Category newCategory)
         {
-            return Ok(await categoryRepo.GetCategory(CategoryId));
+            return Ok(await categoryRepo.AddCategory(newCategory));
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult<ServiceModel<Category>>> DeleteCategory(int id)
+        {
+            return Ok(await categoryRepo.DeleteCategory(id));
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<ServiceModel<Category>>> UpdateCategory(Category newCategory)
+        {
+            return Ok(await categoryRepo.UpdateCategory(newCategory));
         }
     }
 }

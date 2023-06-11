@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Goal.Server.Migrations
 {
     [DbContext(typeof(ShopOnlineDbContext))]
-    [Migration("20230607080758_mig2")]
-    partial class mig2
+    [Migration("20230610195052_mig5")]
+    partial class mig5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,9 @@ namespace Goal.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
@@ -49,10 +51,13 @@ namespace Goal.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("IconCSS")
+                    b.Property<string>("Image")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -68,10 +73,10 @@ namespace Goal.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BrandId")
+                    b.Property<int>("BrandId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
@@ -94,9 +99,6 @@ namespace Goal.Server.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("UploadedDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -135,15 +137,15 @@ namespace Goal.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "9121ef9d-ad86-4468-ba7d-8b2fe5594e1f",
-                            ConcurrencyStamp = "86ae6b04-db20-4463-83f6-d4b85c35f5c8",
+                            Id = "81e7f75e-7ad4-482b-97d6-574f47bd0fed",
+                            ConcurrencyStamp = "49df7c80-1ff5-4383-a5a3-b9b29e4f4f41",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "dfeae8e8-e397-491c-ab33-b9f258a0dcce",
-                            ConcurrencyStamp = "bec92ddc-05c8-4479-b37d-095d1348f2e7",
+                            Id = "74a36f82-2dca-4ff3-be8d-d1100cb736df",
+                            ConcurrencyStamp = "09800f14-680e-47d8-b450-9d35492ce97f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -327,11 +329,15 @@ namespace Goal.Server.Migrations
                 {
                     b.HasOne("Goal.Shared.Entities.Brand", "Brand")
                         .WithMany("Products")
-                        .HasForeignKey("BrandId");
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Goal.Shared.Entities.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Brand");
 

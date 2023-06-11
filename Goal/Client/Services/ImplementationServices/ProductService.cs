@@ -18,9 +18,9 @@ namespace Goal.Client.Services.ImplementationServices
             return await product.Content.ReadFromJsonAsync<ServiceModel<Product>>();
         }
 
-        public async Task<ServiceModel<Product>?> DeleteProduct(int ProductId)
+        public async Task<ServiceModel<Product>?> DeleteProduct(int id)
         {
-            var result = await httpClient.DeleteFromJsonAsync<ServiceModel<Product>>($"api/Product/{ProductId}");
+            var result = await httpClient.DeleteFromJsonAsync<ServiceModel<Product>>($"api/Product/{id}");
             return result;
         }
 

@@ -6,7 +6,6 @@ namespace Goal.Shared.Entities
     public class Product
     {
         [Key]
-        [JsonIgnore]
         public int Id { get; set; }
         [Required, StringLength(50, MinimumLength = 6, ErrorMessage = "Назва має складатися з 6 або більше символів.")]
         public string? Name { get; set; }
@@ -17,10 +16,10 @@ namespace Goal.Shared.Entities
         public string? Description { get; set; }
         public Category? Category { get; set; }
         public Brand? Brand { get; set; }
+        public int BrandId { get; set; }
+        public int CategoryId { get; set; }
         public int Quantity { get; set; } = 1;
         [Required]
         public string? Image { get; set; }
-        [Required, DataType(DataType.Date)]
-        public DateTime UploadedDate { get; set; } = DateTime.Now;
     }
 }

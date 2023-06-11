@@ -1,17 +1,14 @@
-﻿@page "/add-product"
+﻿@page "/update-product/{id:int}"
 @using Goal.Client.Services.InterfaceServices;
 @using Goal.Shared.ServerServiceModels;
 @using Goal.Shared.Entities;
-
 @inject IProductService productService
-@inject IBrandService brandService
-@inject ICategoryService categoryService
 
 <div class="row">
     <div class="col-md-6 offset-3">
-        <h3>Додати продукт</h3>
+        <h3>Редагувати продукт</h3>
 
-        <EditForm Model="@newProduct" OnValidSubmit="HandleAddProduct">
+        <EditForm Model="@newProduct" OnValidSubmit="HandleUpdateProduct">
             <DataAnnotationsValidator></DataAnnotationsValidator>
             <ValidationSummary class="form-control p-3"></ValidationSummary>
             <div class="form-group mt-2">
@@ -28,7 +25,7 @@
                 <ValidationMessage For="@(()=> newProduct.OriginalPrice)"></ValidationMessage>
             </div>
             <div class="form-group mt-2">
-                <label class="form-label" for="url">Нова ціна</label>
+                <label class="form-label" for="url">Оновлена ціна</label>
                 <input type="text" id="price" min="0.5" @bind="newProduct.NewPrice" class="form-control"></input>
                 <ValidationMessage For="@(()=> newProduct.NewPrice)"></ValidationMessage>
             </div>
@@ -42,77 +39,41 @@
                 <input type="number" id="description" min="1" @bind="newProduct.Quantity" class="form-control"></input>
                 <ValidationMessage For="@(()=> newProduct.Quantity)"></ValidationMessage>
             </div>
-            <div class="form-group mt-2">
-                <label class="form-label" for="image">Фото</label>&nbsp; <span class="text-danger fw-bold">@uploadMessage</span>
-                <InputFile id="image" OnChange="OnFileChange" class="form-control"></InputFile>
-                <ValidationMessage For="@(()=> newProduct.Image)"></ValidationMessage>
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="@newProduct.Image" class="card-img-top" style="width: 150px; height:100px;" />
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mt-2">
+                        <label class="form-label" for="image">Фото</label>&nbsp; <span class="text-danger fw-bold">@uploadMessage</span>
+                        <InputFile id="image" OnChange="OnFileChange" class="form-control"></InputFile>
+                        <ValidationMessage For="@(()=> newProduct.Image)"></ValidationMessage>
+                    </div>
+                </div>
             </div>
             <div class="form-group mt-2">
-                <label class="form-label" for="brand">Бренд</label>
-                <select class="form-control" @bind="@newProduct.BrandId">
-                    <option value="">Обрати бренд</option>
-                    @if (brands != null)
-                    {
-                        @foreach (var brand in brands)
-                        {
-                            <option value="@brand.Id">@brand.Name</option>
-                        }
-                    }
-                </select>
-                <ValidationMessage For="@(()=> newProduct.BrandId)"></ValidationMessage>
-            </div>
-            <div class="form-group mt-2">
-                <label class="form-label" for="category">Категорія</label>
-                <select class="form-control" @bind="@newProduct.CategoryId">
-                    <option value="">Обрати категорію</option>
-                    @if (categories != null)
-                    {
-                        @foreach (var category in categories)
-                        {
-                            <option value="@category.Id">@category.Name</option>
-                        }
-                    }
-                </select>
-                <ValidationMessage For="@(()=> newProduct.CategoryId)"></ValidationMessage>
-            </div>
-
-            <div class="form-check mt-2">
-                <button type="submit" class="btn btn-primary"> <i class="oi oi-plus"></i> Зберегти</button>
+                <button type="submit" class="btn btn-primary float-end"> <i class="oi oi-arrow-circle-top"></i> Зберегти</button>
             </div>
         </EditForm>
     </div>
 </div>
 
+
 @code {
+    [Parameter] public int Id { get; set; }
     public Product newProduct = new Product();
     private string? uploadMessage;
     private string? Message = string.Empty;
     private string? CssClass = string.Empty;
-    private List<Brand> brands;
-    private List<Category> categories;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var brandResponse = await brandService.GetBrands();
-        if (brandResponse != null)
-        {
-            brands = brandResponse.List;
-        }
-
-        var categoryResponse = await categoryService.GetCategories();
-        if (categoryResponse != null)
-        {
-            categories = categoryResponse.List;
-        }
-    }
-
-    async Task HandleAddProduct()
+    async Task HandleUpdateProduct()
     {
         Message = "";
-        var response = await productService.AddProduct(newProduct);
+        var response = await productService.UpdateProduct(newProduct);
         Message = response!.Message;
         CssClass = response!.CssClass;
     }
+
 
     async Task OnFileChange(InputFileChangeEventArgs e)
     {
@@ -126,10 +87,21 @@
             await resizeImage.OpenReadStream().ReadAsync(buffer);
             var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
             newProduct.Image = imageData;
+
         }
-        else
+        else { uploadMessage = "Неправильний формат файлу (потрібен .jpg)"; }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id > 0)
         {
-            uploadMessage = "Неправильний формат файлу (потрібен .jpg)";
+            var product = await productService.GetProduct(Id);
+            Message = product!.Message;
+            CssClass = product.CssClass;
+            if (product.Single != null)
+                newProduct = product!.Single!;
+
         }
     }
 }

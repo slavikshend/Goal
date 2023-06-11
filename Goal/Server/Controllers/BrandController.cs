@@ -4,6 +4,7 @@ using Goal.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace Goal.Server.Controllers
 {
@@ -17,23 +18,35 @@ namespace Goal.Server.Controllers
             this.brandRepo = brandRepo;
         }
 
-        [HttpGet("Get-Brands")]
-        public async Task<ActionResult<BrandServiceModel>> GetBrands()
+        [HttpGet]
+        public async Task<ActionResult<ServiceModel<Brand>>> GetBrands()
         {
             return Ok(await brandRepo.GetBrands());
         }
 
-        [HttpPost("Add-Brand")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BrandServiceModel>> AddBrand([FromBody]Brand NewBrand)
+        [HttpPost]
+        //[Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceModel<Brand>>> AddBrand([FromBody]Brand NewBrand)
         {
             return Ok(await brandRepo.AddBrand(NewBrand));
         }
 
-        [HttpGet("Get-Brand/{BrandId:int}")]
-        public async Task<ActionResult<BrandServiceModel>> GetBrand(int BrandId)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ServiceModel<Brand>>> GetBrand(int id)
         {
-            return Ok(await brandRepo.GetBrand(BrandId));
+            return Ok(await brandRepo.GetBrand(id));
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult<ServiceModel<Brand>>> DeleteBrand(int id)
+        {
+            return Ok(await brandRepo.DeleteBrand(id));
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<ServiceModel<Brand>>> UpdateBrand(Brand newBrand)
+        {
+            return Ok(await brandRepo.UpdateBrand(newBrand));
         }
     }
 }

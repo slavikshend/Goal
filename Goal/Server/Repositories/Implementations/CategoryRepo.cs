@@ -1,10 +1,11 @@
-﻿using Goal.Server.Repositories.Interfaces;
+﻿using Goal.Server.Context;
+using Goal.Server.Repositories.Interfaces;
 using Goal.Shared.Entities;
 using Goal.Shared.ServerServiceModels;
-using Goal.Server.Context;
 using Microsoft.EntityFrameworkCore;
+using System;
 
-namespace Goal.Server.Repositories.CategoryRepositories
+namespace Goal.Server.Repositories.Implementations
 {
     public class CategoryRepo : ICategoryRepo
     {
@@ -19,10 +20,10 @@ namespace Goal.Server.Repositories.CategoryRepositories
             var response = new ServiceModel<Category>();
             if (newCategory != null)
             {
-                var category = await appDbContext.Categories!.FirstOrDefaultAsync(c => c.Name == newCategory.Name);
+                var category = await appDbContext.Categories.FirstOrDefaultAsync(c => c.Name == newCategory.Name);
                 if (category != null)
                 {
-                    response.Message = "Category already created !";
+                    response.Message = "Така категорія вже є!";
                     response.Success = false;
                     response.CssClass = "info fw-bold";
                 }
@@ -31,11 +32,9 @@ namespace Goal.Server.Repositories.CategoryRepositories
                     newCategory.Url = newCategory.Name!.ToLower().Replace(" ", "-");
                     appDbContext.Categories.Add(newCategory);
                     await appDbContext.SaveChangesAsync();
-                    response.Message = "Category created!";
+                    response.Message = "Категорія створена!";
                     response.Success = true;
                     response.CssClass = "success fw-bold";
-                    var list = await GetCategories();
-                    response.List = list.List;
                 }
             }
             else
@@ -57,7 +56,7 @@ namespace Goal.Server.Repositories.CategoryRepositories
                 {
                     appDbContext.Categories.Remove(category!.Single!);
                     await appDbContext.SaveChangesAsync();
-                    response.Message = $"Category with the name {category.Single?.Name} deleted!";
+                    response.Message = $"Категорія з назвою {category.Single?.Name} видалена!";
                     response.Success = false;
                     response.CssClass = "danger fw-bold";
                     response.Single = category.Single;
@@ -108,61 +107,61 @@ namespace Goal.Server.Repositories.CategoryRepositories
                 var category = await appDbContext.Categories.SingleOrDefaultAsync(c => c.Id == id);
                 if (category != null)
                 {
-                    response.Message = "Category  found!";
-                    response.CssClass = "success fw-bold";
-                    response.Success = true;
-                    response.Single = category;
+                        response.Message = "Категорія знайдена!";
+                        response.CssClass = "success fw-bold";
+                        response.Success = true;
+                        response.Single = category;
+                    }
+                    else
+                    {
+                        response.Message = "Категорія не знайдена!";
+                        response.CssClass = "danger fw-bold";
+                        response.Success = false;
+                    }
                 }
                 else
                 {
-                    response.Message = "Category not found!";
+                    response.Message = "Неправильна категорія!";
                     response.CssClass = "danger fw-bold";
                     response.Success = false;
                 }
-            }
-            else
-            {
-                response.Message = "Invalid category!";
-                response.CssClass = "danger fw-bold";
-                response.Success = false;
+
+                return response;
             }
 
-            return response;
-        }
-
-        public async Task<ServiceModel<Category>> UpdateCategory(Category newCategory)
-        {
-            var response = new ServiceModel<Category>();
-            if (newCategory != null)
+            public async Task<ServiceModel<Category>> UpdateCategory(Category newCategory)
             {
-                var category = await GetCategory(newCategory.Id);
-                if (category.Single != null)
+                var response = new ServiceModel<Category>();
+                if (newCategory != null)
                 {
-                    category.Single.Name = newCategory.Name;
-                    category.Single.Url = newCategory.Name!.ToLower().Replace(" ", "-");
-                    category.Single.Image = newCategory.Image;
-                    await appDbContext.SaveChangesAsync();
-                    response.Message = "Category updated!";
-                    response.CssClass = "success fw-bold";
-                    response.Single = category.Single;
-                    response.Success = true;
-                    var categories = await GetCategories();
-                    response.List = categories.List;
+                    var category = await GetCategory(newCategory.Id);
+                    if (category.Single != null)
+                    {
+                        category.Single.Name = newCategory.Name;
+                        category.Single.Url = newCategory.Name!.ToLower().Replace(" ", "-");
+                        category.Single.Image = newCategory.Image;
+                        await appDbContext.SaveChangesAsync();
+                        response.Message = "Категоія оновлена!";
+                        response.CssClass = "success fw-bold";
+                        response.Single = category.Single;
+                        response.Success = true;
+                        var categories = await GetCategories();
+                        response.List = categories.List;
+                    }
+                    else
+                    {
+                        response.Message = category.Message;
+                        response.CssClass = category.CssClass;
+                        response.Success = category.Success;
+                    }
                 }
                 else
                 {
-                    response.Message = category.Message;
-                    response.CssClass = category.CssClass;
-                    response.Success = category.Success;
+                    response.Message = "Category object is empty!";
+                    response.CssClass = "danger fw-bold";
+                    response.Success = false;
                 }
+                return response;
             }
-            else
-            {
-                response.Message = "Category object is empty!";
-                response.CssClass = "danger fw-bold";
-                response.Success = false;
-            }
-            return response;
         }
     }
-}

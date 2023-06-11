@@ -5,9 +5,10 @@ namespace Goal.Client.Services.InterfaceServices
 {
     public interface IBrandService
     {
-        public Task<BrandServiceModel?> AddBrand(Brand NewBrand);
-        public Task<BrandServiceModel?> GetBrands();
-        public Task<BrandServiceModel?> GetBrand(int BrandId);
-        public Task<BrandServiceModel?> DeleteBrand(int BrandId);
+        Task<ServiceModel<Brand>> AddBrand(Brand newBrand);
+        Task<ServiceModel<Brand>> DeleteBrand(int id);
+        Task<ServiceModel<Brand>> UpdateBrand(Brand newBrand);
+        Task<ServiceModel<Brand>> GetBrand(int id);
+        Task<ServiceModel<Brand>> GetBrands();
     }
 }

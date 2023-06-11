@@ -5,7 +5,7 @@ using Goal.Shared.ServerServiceModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace ORMExplained.Server.Repositories.Implementations
+namespace Goal.Server.Repositories.Implementations
 {
     public class ProductRepo : IProductRepo
     {
@@ -27,7 +27,7 @@ namespace ORMExplained.Server.Repositories.Implementations
                     await appDbContext.SaveChangesAsync();
                     Response.Single = NewProduct;
                     Response.Success = true;
-                    Response.Message = "Product added successfully!";
+                    Response.Message = "Продукт успішно доданий!";
                     Response.CssClass = "success";
                     return Response;
                 }
@@ -56,11 +56,9 @@ namespace ORMExplained.Server.Repositories.Implementations
             {
                 appDbContext.Products.Remove(product.Single);
                 await appDbContext.SaveChangesAsync();
-                response.Message = "Product deleted!";
+                response.Message = "Продукт був видалений!";
                 response.CssClass = "success fw-bold";
                 response.Single = product.Single;
-                var products = await GetProducts();
-                response.List = products.List;
             }
             else
             {
